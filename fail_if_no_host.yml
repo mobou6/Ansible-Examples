@@ -5,10 +5,9 @@
   tasks:
   - name: "Fail if {{ target_machines }} is/are not in the inventory"
     assert:
-      that: 
-        - target_machines in ansible_play_hosts
-      fail_msg: "{{ target_machines }} is/are not found on the inventory"
-      success_msg: "{{ target_machines }} is/are in the inventory"
+      that:
+        - (target_machines.split(',')|list)|intersect(ansible_play_hosts) != []
+      fail_msg: "{{ target_machines.split(',')|list |difference(ansible_play_hosts) | join(' ') }} is/are not found on the inventory"
+      success_msg: "{{ target_machines.split(',')|list|intersect(ansible_play_hosts) | join(' ') }} is/are in the inventory"
     delegate_to: localhost
     run_once: true
-    
