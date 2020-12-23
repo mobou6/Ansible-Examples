@@ -1,11 +1,14 @@
-- name : Fail Job if no active host on the inventory
+- name : Fail the playbook if target_machines list hosts is not in the inventory
   hosts: "{{ target_machines }},localhost" #you need to have the localhost machine on the inventory to be able to execute tasks
   gather_facts: false
 
   tasks:
-  - name: "Fail if {{ target_machines }} is not in the inventory"
-    fail:
-      msg: "{{ target_machines }} not found on the inventory"
-    failed_when : target_machines not in ansible_play_hosts
+  - name: "Fail if {{ target_machines }} is/are not in the inventory"
+    assert:
+      that: 
+        - target_machines in ansible_play_hosts
+      fail_msg: "{{ target_machines }} not found on the inventory"
+      success_msg: "{{ target_machines }} is in the inventory"
     delegate_to: localhost
     run_once: true
+    
